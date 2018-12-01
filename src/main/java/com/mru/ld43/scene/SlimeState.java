@@ -26,6 +26,7 @@ import java.util.Map;
  * @author matt
  */
 public class SlimeState extends BaseAppState{
+    public static final float SLIMESCALE = 0.1f;
     private final Map<EntityId, Spatial> spatMap = new HashMap<>();
     private final Node slimeNode = new Node("Slimes");
     private final EntityData data;
@@ -45,9 +46,6 @@ public class SlimeState extends BaseAppState{
         for(Entity e : slimes){
             addSlime(e);
         }
-        app.enqueue(() -> {
-            spawnSlime(0,0,Slime.GREEN, 5);
-        });
     }
 
     @Override
@@ -63,7 +61,7 @@ public class SlimeState extends BaseAppState{
             for(Entity e : slimes.getChangedEntities()){
                 Spatial spat = spatMap.get(e.getId());
                 Position pos = e.get(Position.class);
-                spat.setLocalTranslation(pos.x, pos.y, 0);
+                spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
             }
         }
     }
@@ -71,14 +69,15 @@ public class SlimeState extends BaseAppState{
     private void addSlime(Entity e){
         Position pos = e.get(Position.class);
         Slime slime = e.get(Slime.class);
-        Spatial spat = createSlimeModel(Slime.GREEN, 5);
+        Spatial spat = createSlimeModel(slime.getColor(), 5);
         slimeNode.attachChild(spat);
         spatMap.put(e.getId(), spat);
-        spat.setLocalTranslation(pos.x, pos.y, 0);
+        spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
+        System.out.println("Slime created at "+pos);
     }
     
     private Spatial createSlimeModel(String color, int size){
-        float slimeScale = size*0.1f;
+        float slimeScale = size*SLIMESCALE;
         Geometry geo = new Geometry("Slime", new Box(slimeScale, slimeScale, slimeScale));
         //TODO: Cache materials per color to save draw calls
         Material mat = new Material(slimeMat.getMaterialDef());
@@ -95,15 +94,14 @@ public class SlimeState extends BaseAppState{
         }
         mat.setColor("Color", col);
         geo.setMaterial(mat);
-        System.out.println("Made a "+color+" slime");
         return geo;
     }
     
     public EntityId spawnSlime(float posX, float posY, String color, int size){
         EntityId id = data.createEntity();
-        
+        Position pos = new Position(posX, posY);
         data.setComponents(id,
-                new Position(posX, posY),
+                pos,
                 new Slime(color, size),
                 new Collider(false, 
                         Collider.GROUND_GROUP|Collider.PLAYER_GROUP,

@@ -48,13 +48,31 @@ public class PhysState extends BaseAppState{
                 
             }
             for(Entity e : colliders.getAddedEntities()){
-                //for now just adding a basic unit box to all colliders, just to
-                //see the phys
                 Body b = new Body();
                 Rectangle rec = new Rectangle(1,1);
+                //check if slime
+                Slime slime = data.getComponent(e.getId(), Slime.class);
+                if(slime != null){
+                    rec = new Rectangle(slime.getSize()*SlimeState.SLIMESCALE,
+                        slime.getSize()*SlimeState.SLIMESCALE);
+                }
+                //check if wall
+                Wall wall = data.getComponent(e.getId(), Wall.class);
+                if(wall != null){
+                    rec = new Rectangle(wall.getWidth(), wall.getHeight());
+                }
                 b.addFixture(rec);
-                b.setMassType(MassType.NORMAL);
+                //kinematic and mask
+                Collider col = e.get(Collider.class);
+                if(col.isKinematic()){
+                    b.setMassType(MassType.INFINITE);
+                } else{
+                    b.setMassType(MassType.NORMAL);
+                }
                 b.updateMass();
+                //set initial world pos
+                Position pos = e.get(Position.class);
+                b.translate(pos.getX(), pos.getY());
                 world.addBody(b);
                 bodyMap.put(e.getId(), b);
             }
@@ -64,7 +82,6 @@ public class PhysState extends BaseAppState{
             Body b = bodyMap.get(e.getId());
             Vector2 physPos = b.getWorldCenter();
             e.set(new Position((float)physPos.x, (float)physPos.y));
-//            System.out.println(physPos);
         }
     }
 

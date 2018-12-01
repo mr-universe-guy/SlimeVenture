@@ -7,13 +7,10 @@ package com.mru.ld43;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.math.ColorRGBA;
 import com.mru.ld43.scene.PhysState;
-import com.mru.ld43.scene.Position;
-import com.mru.ld43.scene.Slime;
+import com.mru.ld43.scene.SceneState;
 import com.mru.ld43.scene.SlimeState;
 import com.simsilica.es.EntityData;
-import com.simsilica.es.EntityId;
 
 /**
  * Master test state, for testing
@@ -28,10 +25,9 @@ public class GameTestState extends BaseAppState{
         app.getStateManager().attachAll(
                 dataState,
                 new PhysState(data),
-                new SlimeState(data)
+                new SlimeState(data),
+                new SceneState(data)
         );
-//        EntityId test = data.createEntity();
-//        data.setComponents(test, new Position(0,0), new Slime(ColorRGBA.Green));
     }
 
     @Override

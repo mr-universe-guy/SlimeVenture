@@ -8,11 +8,11 @@ package com.mru.ld43.scene;
 import com.simsilica.es.EntityComponent;
 
 /**
- * 2d position
+ *
  * @author matt
  */
 public class Position implements EntityComponent{
-    protected final float x,y;
+    private final float x,y;
 
     public Position(float x, float y) {
         this.x = x;
@@ -25,6 +25,11 @@ public class Position implements EntityComponent{
 
     public float getY() {
         return y;
+    }
+
+    @Override
+    public String toString() {
+        return "Position{" + "x=" + x + ", y=" + y + '}';
     }
     
 }
