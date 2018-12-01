@@ -69,7 +69,7 @@ public class SlimeState extends BaseAppState{
     private void addSlime(Entity e){
         Position pos = e.get(Position.class);
         Slime slime = e.get(Slime.class);
-        Spatial spat = createSlimeModel(slime.getColor(), 5);
+        Spatial spat = createSlimeModel(slime.getColor(), slime.getSize());
         slimeNode.attachChild(spat);
         spatMap.put(e.getId(), spat);
         spat.setLocalTranslation(pos.getX(), pos.getY(), 0);

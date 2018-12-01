@@ -7,9 +7,11 @@ package com.mru.ld43;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.mru.ld43.mob.MobState;
 import com.mru.ld43.scene.PhysState;
 import com.mru.ld43.scene.SceneState;
 import com.mru.ld43.scene.SlimeState;
+import com.mru.ld43.ui.PlayerControlState;
 import com.simsilica.es.EntityData;
 
 /**
@@ -25,7 +27,9 @@ public class GameTestState extends BaseAppState{
         app.getStateManager().attachAll(
                 dataState,
                 new PhysState(data),
+                new MobState(data),
                 new SlimeState(data),
+                new PlayerControlState(data),
                 new SceneState(data)
         );
     }

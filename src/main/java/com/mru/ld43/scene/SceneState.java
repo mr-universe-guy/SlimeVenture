@@ -9,12 +9,14 @@ import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.mru.ld43.SlimeApp;
+import com.mru.ld43.mob.Driver;
+import com.mru.ld43.mob.Mob;
+import com.mru.ld43.ui.PlayerControlState;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -134,5 +136,17 @@ public class SceneState extends BaseAppState{
                 new Collider(true, Collider.GROUND_GROUP, Collider.PLAYER_GROUP|Collider.SLIME_GROUP)
         );
         sceneObjects.add(id);
+    }
+    
+    public void spawnPlayer(float xPos, float yPos){
+        EntityId playerId = getState(PlayerControlState.class).getPlayerId();
+        data.setComponents(playerId, 
+                new Position(xPos, yPos),
+                new Slime(Slime.GREEN, 5),
+                new Collider(false, Collider.PLAYER_GROUP,
+                        Collider.GROUND_GROUP|Collider.SLIME_GROUP|Collider.POWERUP_GROUP),
+                new Driver(0,0),
+                new Mob(1)
+        );
     }
 }

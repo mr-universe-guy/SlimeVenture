@@ -12,9 +12,15 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.Step;
+import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.contact.ContactAdapter;
+import org.dyn4j.dynamics.contact.ContactPoint;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Vector2;
@@ -25,9 +31,13 @@ import org.dyn4j.geometry.Vector2;
  */
 public class PhysState extends BaseAppState{
     protected final Map<EntityId, Body> bodyMap = new HashMap<>();
+    protected final Map<EntityId, Set<EntityId>> contactMap = new HashMap<>();
     protected final World world = new World();
+    private final Contacts contactListener = new Contacts();
+    private final Stepper stepListener = new Stepper();
     private final EntityData data;
     private EntitySet colliders;
+    
 
     public PhysState(EntityData data) {
         this.data = data;
@@ -37,6 +47,8 @@ public class PhysState extends BaseAppState{
     protected void initialize(Application app) {
         colliders = data.getEntities(Collider.class, Position.class);
         world.setGravity(new Vector2(0,-10));
+        world.addListener(stepListener);
+        world.addListener(contactListener);
     }
 
     @Override
@@ -45,7 +57,8 @@ public class PhysState extends BaseAppState{
         if(colliders.applyChanges()){
             //add and remove
             for(Entity e : colliders.getRemovedEntities()){
-                
+                Body b = bodyMap.remove(e.getId());
+                world.removeBody(b);
             }
             for(Entity e : colliders.getAddedEntities()){
                 Body b = new Body();
@@ -67,9 +80,11 @@ public class PhysState extends BaseAppState{
                 if(col.isKinematic()){
                     b.setMassType(MassType.INFINITE);
                 } else{
-                    b.setMassType(MassType.NORMAL);
+                    b.setMassType(MassType.FIXED_ANGULAR_VELOCITY);
                 }
                 b.updateMass();
+                //userdata
+                b.setUserData(e.getId());
                 //set initial world pos
                 Position pos = e.get(Position.class);
                 b.translate(pos.getX(), pos.getY());
@@ -99,5 +114,46 @@ public class PhysState extends BaseAppState{
     protected void onDisable() {
         
     }
+
+    public World getWorld() {
+        return world;
+    }
     
+    public Body getBodyFromId(EntityId id){
+        return bodyMap.get(id);
+    }
+    
+    private class Contacts extends ContactAdapter{
+        @Override
+        public boolean begin(ContactPoint point) {
+            EntityId id1 = (EntityId)point.getBody1().getUserData();
+            EntityId id2 = (EntityId)point.getBody2().getUserData();
+            Set<EntityId> id1Current = contactMap.get(id1);
+            Set<EntityId> id2Current = contactMap.get(id2);
+            if(id1Current == null){
+                id1Current = new HashSet<>();
+                contactMap.put(id1, id1Current);
+            }
+            if(id2Current == null){
+                id2Current = new HashSet<>();
+                contactMap.put(id2, id2Current);
+            }
+            id1Current.add(id2);
+            id2Current.add(id1);
+            return true;
+        }
+    }
+    
+    private class Stepper extends StepAdapter{
+        @Override
+        public void end(Step step, World world) {
+            //publish the previous steps results to ecs
+            for(EntityId id : contactMap.keySet()){
+                Set<EntityId> contacts = contactMap.get(id);
+                Contact contact = new Contact(contacts.toArray(new EntityId[contacts.size()]));
+                data.setComponent(id, new Contact(contacts.toArray(new EntityId[contacts.size()])));
+            }
+            contactMap.clear();
+        }
+    }
 }
