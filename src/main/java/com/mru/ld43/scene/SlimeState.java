@@ -46,7 +46,7 @@ public class SlimeState extends BaseAppState{
             addSlime(e);
         }
         app.enqueue(() -> {
-            spawnSlime(0,0,ColorRGBA.Green);
+            spawnSlime(0,0,Slime.GREEN, 5);
         });
     }
 
@@ -71,28 +71,40 @@ public class SlimeState extends BaseAppState{
     private void addSlime(Entity e){
         Position pos = e.get(Position.class);
         Slime slime = e.get(Slime.class);
-        Spatial spat = createSlimeModel(slime.getColor());
+        Spatial spat = createSlimeModel(Slime.GREEN, 5);
         slimeNode.attachChild(spat);
         spatMap.put(e.getId(), spat);
         spat.setLocalTranslation(pos.x, pos.y, 0);
     }
     
-    private Spatial createSlimeModel(ColorRGBA color){
-        Geometry geo = new Geometry("Slime", new Box(0.5f, 0.5f, 0.5f));
+    private Spatial createSlimeModel(String color, int size){
+        float slimeScale = size*0.1f;
+        Geometry geo = new Geometry("Slime", new Box(slimeScale, slimeScale, slimeScale));
         //TODO: Cache materials per color to save draw calls
         Material mat = new Material(slimeMat.getMaterialDef());
-        mat.setColor("Color", color);
+        ColorRGBA col;
+        switch(color){
+            case Slime.GREEN: col = ColorRGBA.Green;
+            break;
+            case Slime.BLUE: col = ColorRGBA.Blue;
+            break;
+            case Slime.RED: col = ColorRGBA.Red;
+            break;
+            default: col = ColorRGBA.White;
+            break;
+        }
+        mat.setColor("Color", col);
         geo.setMaterial(mat);
-        System.out.println("Made a slime");
+        System.out.println("Made a "+color+" slime");
         return geo;
     }
     
-    public EntityId spawnSlime(float posX, float posY, ColorRGBA color){
+    public EntityId spawnSlime(float posX, float posY, String color, int size){
         EntityId id = data.createEntity();
         
         data.setComponents(id,
                 new Position(posX, posY),
-                new Slime(color),
+                new Slime(color, size),
                 new Collider(false, 
                         Collider.GROUND_GROUP|Collider.PLAYER_GROUP,
                         Collider.SLIME_GROUP)

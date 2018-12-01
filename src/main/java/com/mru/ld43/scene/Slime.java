@@ -13,13 +13,23 @@ import com.simsilica.es.EntityComponent;
  * @author matt
  */
 public class Slime implements EntityComponent{
-    private final ColorRGBA color;
+    public static final String GREEN = "Green";
+    public static final String BLUE = "Blue";
+    public static final String RED = "Red";
+    
+    private final String color;
+    private final int size;
 
-    public Slime(ColorRGBA color) {
+    public Slime(String color, int size) {
         this.color = color;
+        this.size = size;
     }
 
-    public ColorRGBA getColor() {
+    public String getColor() {
         return color;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
