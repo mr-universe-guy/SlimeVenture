@@ -7,6 +7,7 @@ package com.mru.ld43.ui;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.mru.ld43.scene.Position;
 import com.simsilica.es.EntityData;
@@ -19,6 +20,7 @@ import com.simsilica.es.WatchedEntity;
  */
 public class CameraState extends BaseAppState{
     private final EntityData data;
+    private float camDistance = 10f;
     private Camera cam;
     protected WatchedEntity target;
 
@@ -42,7 +44,9 @@ public class CameraState extends BaseAppState{
     @Override
     public void update(float tpf) {
         if(target != null && target.applyChanges()){
-            
+            Position pos = target.get(Position.class);
+            Vector3f camPos = new Vector3f(pos.getX(),pos.getY(),camDistance);
+            cam.setLocation(camPos);
         }
     }
 

@@ -49,6 +49,10 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
         mapper.map(MOVE_X, InputState.Positive, KeyInput.KEY_RIGHT);
         
         mapper.addAnalogListener(this, MOVE_X);
+        //add camera state
+        CameraState cam = new CameraState(data);
+        cam.setTarget(player.getId());
+        getStateManager().attach(cam);
     }
 
     @Override
