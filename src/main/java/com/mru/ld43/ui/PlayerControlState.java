@@ -20,18 +20,21 @@ import com.simsilica.lemur.input.AnalogFunctionListener;
 import com.simsilica.lemur.input.FunctionId;
 import com.simsilica.lemur.input.InputMapper;
 import com.simsilica.lemur.input.InputState;
+import com.simsilica.lemur.input.StateFunctionListener;
 
 /**
  *
  * @author matt
  */
-public class PlayerControlState extends BaseAppState implements AnalogFunctionListener{
+public class PlayerControlState extends BaseAppState implements AnalogFunctionListener,
+        StateFunctionListener{
     public static final String PLAYERGROUP = "PlayerGroup";
     public static final FunctionId MOVE_X = new FunctionId(PLAYERGROUP, "X_MOVEMENT");
-    public static final FunctionId MOVE_Y = new FunctionId(PLAYERGROUP, "Y_MOVEMENT");
+    public static final FunctionId JUMP = new FunctionId(PLAYERGROUP, "Y_MOVEMENT");
     private final EntityData data;
     protected WatchedEntity player;
     private float xInput = 0;
+    private float yInput = 0;
 
     public PlayerControlState(EntityData data) {
         this.data = data;
@@ -47,8 +50,10 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
         mapper.activateGroup(PLAYERGROUP);
         mapper.map(MOVE_X, InputState.Negative, KeyInput.KEY_LEFT);
         mapper.map(MOVE_X, InputState.Positive, KeyInput.KEY_RIGHT);
+        mapper.map(JUMP, InputState.Positive, KeyInput.KEY_UP);
         
         mapper.addAnalogListener(this, MOVE_X);
+        mapper.addStateListener(this, JUMP);
         //add camera state
         CameraState cam = new CameraState(data);
         cam.setTarget(player.getId());
@@ -60,7 +65,7 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
         if(player.applyChanges()){
             
         }
-        player.set(new Driver(xInput, 0));
+        player.set(new Driver(xInput, yInput));
     }
     
     public EntityId getPlayerId(){
@@ -86,6 +91,17 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
     public void valueActive(FunctionId fi, double d, double d1) {
         if(fi.equals(MOVE_X)){
             xInput = (float)d;
+        }
+    }
+
+    @Override
+    public void valueChanged(FunctionId fi, InputState is, double d) {
+        if(fi.equals(JUMP)){
+            if(is.equals(InputState.Positive)){
+                yInput = 1f;
+            } else{
+                yInput = 0;
+            }
         }
     }
     
