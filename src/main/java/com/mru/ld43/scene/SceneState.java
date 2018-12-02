@@ -133,7 +133,7 @@ public class SceneState extends BaseAppState{
         data.setComponents(id,
                 new Position(xPos, yPos),
                 new Wall(width, height),
-                new Collider(true, Collider.GROUND_GROUP, Collider.PLAYER_GROUP|Collider.SLIME_GROUP)
+                new Collider(true, width, height)
         );
         sceneObjects.add(id);
     }
@@ -143,10 +143,10 @@ public class SceneState extends BaseAppState{
         data.setComponents(playerId, 
                 new Position(xPos, yPos),
                 new Slime(Slime.GREEN, 5),
-                new Collider(false, Collider.PLAYER_GROUP,
-                        Collider.GROUND_GROUP|Collider.SLIME_GROUP|Collider.POWERUP_GROUP),
+//                new Collider(false, Collider.PLAYER_GROUP,
+//                        Collider.GROUND_GROUP|Collider.SLIME_GROUP|Collider.POWERUP_GROUP),
                 new Driver(0,0),
-                new Mob(1)
+                new Mob(3)
         );
     }
 }

@@ -20,6 +20,9 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.HashMap;
 import java.util.Map;
+import org.dyn4j.dynamics.Step;
+import org.dyn4j.dynamics.StepAdapter;
+import org.dyn4j.dynamics.World;
 
 /**
  * Makes slimes the correct color/size
@@ -30,7 +33,8 @@ public class SlimeState extends BaseAppState{
     private final Map<EntityId, Spatial> spatMap = new HashMap<>();
     private final Node slimeNode = new Node("Slimes");
     private final EntityData data;
-    private EntitySet slimes;
+    private final SlimeListener slimeListener = new SlimeListener();
+    private EntitySet slimes, collidedSlimes;
     private Material slimeMat;
 
     public SlimeState(EntityData data) {
@@ -40,12 +44,14 @@ public class SlimeState extends BaseAppState{
     @Override
     protected void initialize(Application app) {
         slimes = data.getEntities(Slime.class, Position.class);
+        collidedSlimes = data.getEntities(Slime.class, Contact.class);
         slimeMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         ((SlimeApp)app).getRootNode().attachChild(slimeNode);
         slimes.applyChanges();
         for(Entity e : slimes){
             addSlime(e);
         }
+        getState(PhysState.class).getWorld().addListener(slimeListener);
     }
 
     @Override
@@ -60,6 +66,10 @@ public class SlimeState extends BaseAppState{
             }
             for(Entity e : slimes.getChangedEntities()){
                 Spatial spat = spatMap.get(e.getId());
+                Slime slime = e.get(Slime.class);
+                //todo: change color and size
+                float colSize = slime.getSize()*(SLIMESCALE*2);
+                e.set(new Collider(false, colSize, colSize));
                 Position pos = e.get(Position.class);
                 spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
             }
@@ -70,6 +80,8 @@ public class SlimeState extends BaseAppState{
         Position pos = e.get(Position.class);
         Slime slime = e.get(Slime.class);
         Spatial spat = createSlimeModel(slime.getColor(), slime.getSize());
+        float colSize = slime.getSize()*(SLIMESCALE*2);
+        e.set(new Collider(false, colSize, colSize));
         slimeNode.attachChild(spat);
         spatMap.put(e.getId(), spat);
         spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
@@ -102,10 +114,7 @@ public class SlimeState extends BaseAppState{
         Position pos = new Position(posX, posY);
         data.setComponents(id,
                 pos,
-                new Slime(color, size),
-                new Collider(false, 
-                        Collider.GROUND_GROUP|Collider.PLAYER_GROUP,
-                        Collider.SLIME_GROUP)
+                new Slime(color, size)
         );
         
         return id;
@@ -116,6 +125,7 @@ public class SlimeState extends BaseAppState{
         slimeNode.removeFromParent();
         spatMap.clear();
         slimes.release();
+        getState(PhysState.class).getWorld().removeListener(slimeListener);
     }
 
     @Override
@@ -128,4 +138,51 @@ public class SlimeState extends BaseAppState{
         
     }
     
+    /**
+     * Slime Listener looks for collisions between slimes and determines if they
+     * should grow or shrink/die
+     */
+    private class SlimeListener extends StepAdapter{
+        //lets listen to the beginning of each new step
+        @Override
+        public void begin(Step step, World world) {
+            if(collidedSlimes.applyChanges()){
+                for(Entity e : collidedSlimes){
+                    Slime slime = e.get(Slime.class);
+                    for(EntityId id : e.get(Contact.class).getContactIds()){
+                        //we only care about slime x slime
+                        Entity e2 = collidedSlimes.getEntity(id);
+                        if(e2 == null) continue;
+                        Slime slime2 = e2.get(Slime.class);
+                        if(slime.getColor().equals(slime2.getColor())){
+                            //we combine
+                            if(slime.getSize() > slime2.getSize()){
+                                //kill slime2 and grow slime 1
+                                combine(e, slime, e2);
+                            } else{
+                                combine(e2, slime2, e);
+                            }
+                        } else{
+                            //we attak
+                            if(slime.getSize() > slime2.getSize()){
+                                attack(e, slime, e2);
+                            } else{
+                                attack(e2, slime2, e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        private void combine(Entity e1, Slime slime, Entity e2){
+            data.removeEntity(e2.getId());
+            e1.set(new Slime(slime.getColor(), slime.getSize()+1));
+        }
+        
+        private void attack(Entity e1, Slime slime, Entity e2){
+            data.removeEntity(e2.getId());
+            e1.set(new Slime(slime.getColor(), slime.getSize()-1));
+        }
+    }
 }

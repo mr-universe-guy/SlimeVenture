@@ -58,17 +58,7 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
     @Override
     public void update(float tpf) {
         if(player.applyChanges()){
-            Contact contact = player.get(Contact.class);
-            if(contact != null){
-                //what are we contacting?
-                for(EntityId id : contact.getContactIds()){
-                    Slime slime = data.getComponent(id, Slime.class);
-                    if(slime != null){
-                        //we are touching a slime
-                        System.out.println("Player is touching a slime");
-                    }
-                }
-            }
+            
         }
         player.set(new Driver(xInput, 0));
     }

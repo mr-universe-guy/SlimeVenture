@@ -45,7 +45,7 @@ public class PhysState extends BaseAppState{
 
     @Override
     protected void initialize(Application app) {
-        colliders = data.getEntities(Collider.class, Position.class);
+        colliders = data.getEntities(Collider.class);
         world.setGravity(new Vector2(0,-10));
         world.addListener(stepListener);
         world.addListener(contactListener);
@@ -62,34 +62,23 @@ public class PhysState extends BaseAppState{
             }
             for(Entity e : colliders.getAddedEntities()){
                 Body b = new Body();
-                Rectangle rec = new Rectangle(1,1);
-                //check if slime
-                Slime slime = data.getComponent(e.getId(), Slime.class);
-                if(slime != null){
-                    rec = new Rectangle(slime.getSize()*SlimeState.SLIMESCALE,
-                        slime.getSize()*SlimeState.SLIMESCALE);
-                }
-                //check if wall
-                Wall wall = data.getComponent(e.getId(), Wall.class);
-                if(wall != null){
-                    rec = new Rectangle(wall.getWidth(), wall.getHeight());
-                }
-                b.addFixture(rec);
-                //kinematic and mask
                 Collider col = e.get(Collider.class);
-                if(col.isKinematic()){
-                    b.setMassType(MassType.INFINITE);
-                } else{
-                    b.setMassType(MassType.FIXED_ANGULAR_VELOCITY);
-                }
-                b.updateMass();
+                updateBody(b, col);
                 //userdata
                 b.setUserData(e.getId());
                 //set initial world pos
-                Position pos = e.get(Position.class);
-                b.translate(pos.getX(), pos.getY());
+                Position pos = data.getComponent(e.getId(), Position.class);
+                if(pos != null){
+                    b.translate(pos.getX(), pos.getY());
+                }
                 world.addBody(b);
                 bodyMap.put(e.getId(), b);
+            }
+            for(Entity e : colliders.getChangedEntities()){
+                Body b = bodyMap.get(e.getId());
+                b.removeAllFixtures();
+                Collider col = e.get(Collider.class);
+                updateBody(b, col);
             }
         }
         for(Entity e : colliders){
@@ -98,6 +87,17 @@ public class PhysState extends BaseAppState{
             Vector2 physPos = b.getWorldCenter();
             e.set(new Position((float)physPos.x, (float)physPos.y));
         }
+    }
+    
+    private void updateBody(Body b, Collider col){
+        Rectangle rec = new Rectangle(col.getWidth(), col.getHeight());
+        b.addFixture(rec);
+        if(col.isKinematic()){
+            b.setMassType(MassType.INFINITE);
+        } else{
+            b.setMassType(MassType.FIXED_ANGULAR_VELOCITY);
+        }
+        b.updateMass();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class PhysState extends BaseAppState{
             for(EntityId id : contactMap.keySet()){
                 Set<EntityId> contacts = contactMap.get(id);
                 Contact contact = new Contact(contacts.toArray(new EntityId[contacts.size()]));
-                data.setComponent(id, new Contact(contacts.toArray(new EntityId[contacts.size()])));
+                data.setComponent(id, contact);
             }
             contactMap.clear();
         }

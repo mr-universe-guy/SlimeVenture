@@ -59,12 +59,11 @@ public class MobState extends BaseAppState implements StepListener{
         mobs.applyChanges();
         for(Entity e : mobs){
             Body b = phys.getBodyFromId(e.getId());
-//            System.out.println("Entity has body "+e.getId()+":"+b);
             if(b != null){
                 //simple horizontal movement
                 Mob mob = e.get(Mob.class);
                 Driver drive = e.get(Driver.class);
-                b.applyForce(new Vector2(drive.x * mob.speed, 0));
+                b.applyForce(new Vector2(drive.x*mob.speed, 0));
             }
         }
     }
