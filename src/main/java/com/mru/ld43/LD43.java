@@ -31,6 +31,7 @@ public class LD43 {
         settings.setFullscreen(false);
         settings.setResolution(600, 400);
         app.setDisplayStatView(false);
+        settings.setTitle("LD43: Slime Venture");
         app.setSettings(settings);
         app.start();
     }
