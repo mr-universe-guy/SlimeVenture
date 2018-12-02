@@ -92,6 +92,15 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
     protected void cleanup(Application app) {
         if(player != null) player.release();
         getStateManager().detach(getState(CameraState.class));
+        InputMapper mapper = ((SlimeApp)app).getMapper();
+        mapper.deactivateGroup(PLAYERGROUP);
+        mapper.removeMapping(MOVE_X, KeyInput.KEY_LEFT);
+        mapper.removeMapping(MOVE_X, KeyInput.KEY_RIGHT);
+        mapper.removeMapping(JUMP, KeyInput.KEY_UP);
+        mapper.removeMapping(RESET, KeyInput.KEY_BACK);
+        
+        mapper.removeAnalogListener(this, MOVE_X);
+        mapper.removeStateListener(this, JUMP, RESET);
     }
 
     @Override

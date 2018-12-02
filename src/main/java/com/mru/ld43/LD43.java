@@ -1,5 +1,6 @@
 package com.mru.ld43;
 
+import com.jme3.system.AppSettings;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,11 @@ public class LD43 {
             System.out.println("Starting LD43");
             SlimeApp app = new SlimeApp();
             app.setShowSettings(false);
+            AppSettings settings = new AppSettings(true);
+            settings.setFullscreen(false);
+            settings.setResolution(600, 400);
+            app.setDisplayStatView(false);
+            app.setSettings(settings);
             app.start();
             frame.dispose();
         });

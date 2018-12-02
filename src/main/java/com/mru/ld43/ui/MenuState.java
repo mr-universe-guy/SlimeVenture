@@ -35,13 +35,24 @@ public class MenuState extends BaseAppState{
         intro.setLocalTranslation(((width/2)-labelSize.x/2), (height/2)+(labelSize.y/2)+100,0);
         menuNode.attachChild(intro);
         Container buttonContainer = new Container(new BoxLayout(Axis.Y, FillMode.None));
+        //start game
         Button start = new Button("Start");
-        start.addClickCommands((Command) (Object s) -> {
+        start.addClickCommands((Command) -> {
             System.out.println("Starting game");
             getStateManager().detach(this);
             getStateManager().attach(new GameState());
         });
         buttonContainer.addChild(start);
+        //level selector
+        Button select = new Button("Select Level");
+        buttonContainer.addChild(select);
+        //help menu
+        Button help = new Button("Help");
+        help.addClickCommands((Command)->{
+            getStateManager().detach(this);
+            getStateManager().attach(new HelpState());
+        });
+        buttonContainer.addChild(help);
         //add container to menu
         Vector3f buttonScale = buttonContainer.getPreferredSize();
         buttonContainer.setLocalTranslation((width/2)-(buttonScale.x/2),
