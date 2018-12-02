@@ -79,7 +79,7 @@ public class MobState extends BaseAppState implements StepListener{
                         for(RaycastResult r : results){
                             if(!r.getBody().equals(b)){
                                 //grounded
-                                b.applyImpulse(new Vector2(0,4));
+                                b.applyImpulse(new Vector2(0,mob.speed));
                             }
                         }
                     }

@@ -7,6 +7,7 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.mru.ld43.mob.Mob;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -44,32 +45,45 @@ public class SlimeState extends BaseAppState{
                 data.removeComponent(e.getId(), Model.class);
             }
             for(Entity e : slimes.getAddedEntities()){
-                Position pos = e.get(Position.class);
                 Slime slime = e.get(Slime.class);
-                float colSize = slime.getSize()*(SLIMESCALE*2);
-                e.set(new Collider(false, colSize, colSize));
-                e.set(new Model(Model.SLIME, slime.getColor(), slime.getSize()));
+                setSlimeStats(e.getId(), slime.getColor(), slime.getSize());
             }
             for(Entity e : slimes.getChangedEntities()){
                 Slime slime = e.get(Slime.class);
                 //todo: change color and size
                 if(slime.getSize() <= 0){
                     //kill slime
+                    data.removeEntity(e.getId());
                 }
-                float colSize = slime.getSize()*(SLIMESCALE*2);
-                e.set(new Collider(false, colSize, colSize));
-                e.set(new Model(Model.SLIME, slime.getColor(), slime.getSize()));
+                setSlimeStats(e.getId(), slime.getColor(), slime.getSize());
             }
         }
+    }
+    
+    /**
+     * Sets all the components of a slime to the correct values based on mass
+     * @param id
+     * @param color
+     * @param size 
+     */
+    protected void setSlimeStats(EntityId id, String color, int size){
+        Slime slime = new Slime(color, size);
+        //size 5 slime should have a power of 3, adjust exponentially
+        float power = 0.5f+(size*(3f/5f));
+        Mob mob = new Mob(power);
+        float colSize = slime.getSize()*(SLIMESCALE*2);
+        Collider col = new Collider(false, colSize, colSize);
+        Model model = new Model(Model.SLIME, slime.getColor(), slime.getSize());
+        data.setComponents(id, slime, mob, col, model);
     }
     
     public EntityId spawnSlime(float posX, float posY, String color, int size){
         EntityId id = data.createEntity();
         Position pos = new Position(posX, posY);
         data.setComponents(id,
-                pos,
-                new Slime(color, size)
+                pos
         );
+        setSlimeStats(id, color, size);
         
         return id;
     }
@@ -129,12 +143,12 @@ public class SlimeState extends BaseAppState{
         
         private void combine(Entity e1, Slime slime, Entity e2){
             data.removeEntity(e2.getId());
-            e1.set(new Slime(slime.getColor(), slime.getSize()+1));
+            setSlimeStats(e1.getId(), slime.getColor(), slime.getSize()+1);
         }
         
         private void attack(Entity e1, Slime slime, Entity e2){
             data.removeEntity(e2.getId());
-            e1.set(new Slime(slime.getColor(), slime.getSize()-1));
+            setSlimeStats(e1.getId(), slime.getColor(), slime.getSize()-1);
         }
     }
 }
