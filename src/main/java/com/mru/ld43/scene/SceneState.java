@@ -7,30 +7,19 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import com.mru.ld43.SlimeApp;
 import com.mru.ld43.mob.Driver;
 import com.mru.ld43.mob.Mob;
 import com.mru.ld43.ui.PlayerControlState;
-import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import com.simsilica.es.EntitySet;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -40,15 +29,10 @@ import org.codehaus.groovy.control.CompilationFailedException;
  * @author matt
  */
 public class SceneState extends BaseAppState{
-    private static final float WALLWIDTH = 2f;
-    private final Map<EntityId, Spatial> spatMap = new HashMap<>();
     private final List<EntityId> sceneObjects = new ArrayList<>();
-    private final Node wallNode = new Node("Walls");
     protected final Binding binding = new Binding();
     protected final GroovyShell shell = new GroovyShell(binding);
     private final EntityData data;
-    private EntitySet walls;
-    private Material wallMat;
 
     public SceneState(EntityData data) {
         this.data = data;
@@ -56,12 +40,6 @@ public class SceneState extends BaseAppState{
 
     @Override
     protected void initialize(Application app) {
-        //walls
-        walls = data.getEntities(Wall.class, Position.class, Collider.class);
-        ((SlimeApp)app).getRootNode().attachChild(wallNode);
-        wallMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        wallMat.getAdditionalRenderState().setWireframe(true);
-        wallMat.setColor("Color", ColorRGBA.Magenta);
         //groovy
         binding.setProperty("scene", this);
         binding.setProperty("slime", getState(SlimeState.class));
@@ -72,25 +50,6 @@ public class SceneState extends BaseAppState{
 
     @Override
     public void update(float tpf) {
-        if(walls.applyChanges()){
-            for(Entity e : walls.getAddedEntities()){
-                //build wall geo
-                Wall wall = e.get(Wall.class);
-                Position pos = e.get(Position.class);
-                Box box = new Box(wall.getWidth()/2, wall.getHeight()/2, WALLWIDTH/2);
-                Geometry wallGeo = new Geometry("Wall", box);
-                wallGeo.setLocalTranslation(pos.getX(), pos.getY(), 0);
-                wallGeo.setMaterial(wallMat);
-                wallNode.attachChild(wallGeo);
-                spatMap.put(e.getId(), wallGeo);
-                
-            }
-            for(Entity e : walls.getChangedEntities()){
-                Position pos = e.get(Position.class);
-                Spatial wallSpat = spatMap.get(e.getId());
-                wallSpat.setLocalTranslation(pos.getX(), pos.getY(), 0);
-            }
-        }
     }
 
     @Override
@@ -133,7 +92,8 @@ public class SceneState extends BaseAppState{
         data.setComponents(id,
                 new Position(xPos, yPos),
                 new Wall(width, height),
-                new Collider(true, width, height)
+                new Collider(true, width, height),
+                new Model(Model.WALL, width, height)
         );
         sceneObjects.add(id);
     }
@@ -143,8 +103,6 @@ public class SceneState extends BaseAppState{
         data.setComponents(playerId, 
                 new Position(xPos, yPos),
                 new Slime(Slime.GREEN, 5),
-//                new Collider(false, Collider.PLAYER_GROUP,
-//                        Collider.GROUND_GROUP|Collider.SLIME_GROUP|Collider.POWERUP_GROUP),
                 new Driver(0,0),
                 new Mob(3)
         );

@@ -11,6 +11,7 @@ import com.mru.ld43.mob.MobState;
 import com.mru.ld43.scene.PhysState;
 import com.mru.ld43.scene.SceneState;
 import com.mru.ld43.scene.SlimeState;
+import com.mru.ld43.scene.VisualState;
 import com.mru.ld43.ui.PlayerControlState;
 import com.simsilica.es.EntityData;
 
@@ -26,6 +27,7 @@ public class GameTestState extends BaseAppState{
         EntityData data = dataState.getData();
         app.getStateManager().attachAll(
                 dataState,
+                new VisualState(data),
                 new PhysState(data),
                 new MobState(data),
                 new SlimeState(data),

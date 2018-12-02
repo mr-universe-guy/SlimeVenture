@@ -7,19 +7,10 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import com.mru.ld43.SlimeApp;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import java.util.HashMap;
-import java.util.Map;
 import org.dyn4j.dynamics.Step;
 import org.dyn4j.dynamics.StepAdapter;
 import org.dyn4j.dynamics.World;
@@ -30,12 +21,9 @@ import org.dyn4j.dynamics.World;
  */
 public class SlimeState extends BaseAppState{
     public static final float SLIMESCALE = 0.1f;
-    private final Map<EntityId, Spatial> spatMap = new HashMap<>();
-    private final Node slimeNode = new Node("Slimes");
     private final EntityData data;
     private final SlimeListener slimeListener = new SlimeListener();
     private EntitySet slimes, collidedSlimes;
-    private Material slimeMat;
 
     public SlimeState(EntityData data) {
         this.data = data;
@@ -43,14 +31,9 @@ public class SlimeState extends BaseAppState{
 
     @Override
     protected void initialize(Application app) {
-        slimes = data.getEntities(Slime.class, Position.class);
+        slimes = data.getEntities(Slime.class);
         collidedSlimes = data.getEntities(Slime.class, Contact.class);
-        slimeMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        ((SlimeApp)app).getRootNode().attachChild(slimeNode);
         slimes.applyChanges();
-        for(Entity e : slimes){
-            addSlime(e);
-        }
         getState(PhysState.class).getWorld().addListener(slimeListener);
     }
 
@@ -58,55 +41,26 @@ public class SlimeState extends BaseAppState{
     public void update(float tpf) {
         if(slimes.applyChanges()){
             for(Entity e : slimes.getRemovedEntities()){
-                Spatial spat = spatMap.remove(e.getId());
-                spat.removeFromParent();
+                data.removeComponent(e.getId(), Model.class);
             }
             for(Entity e : slimes.getAddedEntities()){
-                addSlime(e);
-            }
-            for(Entity e : slimes.getChangedEntities()){
-                Spatial spat = spatMap.get(e.getId());
+                Position pos = e.get(Position.class);
                 Slime slime = e.get(Slime.class);
-                //todo: change color and size
                 float colSize = slime.getSize()*(SLIMESCALE*2);
                 e.set(new Collider(false, colSize, colSize));
-                Position pos = e.get(Position.class);
-                spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
+                e.set(new Model(Model.SLIME, slime.getColor(), slime.getSize()));
+            }
+            for(Entity e : slimes.getChangedEntities()){
+                Slime slime = e.get(Slime.class);
+                //todo: change color and size
+                if(slime.getSize() <= 0){
+                    //kill slime
+                }
+                float colSize = slime.getSize()*(SLIMESCALE*2);
+                e.set(new Collider(false, colSize, colSize));
+                e.set(new Model(Model.SLIME, slime.getColor(), slime.getSize()));
             }
         }
-    }
-    
-    private void addSlime(Entity e){
-        Position pos = e.get(Position.class);
-        Slime slime = e.get(Slime.class);
-        Spatial spat = createSlimeModel(slime.getColor(), slime.getSize());
-        float colSize = slime.getSize()*(SLIMESCALE*2);
-        e.set(new Collider(false, colSize, colSize));
-        slimeNode.attachChild(spat);
-        spatMap.put(e.getId(), spat);
-        spat.setLocalTranslation(pos.getX(), pos.getY(), 0);
-        System.out.println("Slime created at "+pos);
-    }
-    
-    private Spatial createSlimeModel(String color, int size){
-        float slimeScale = size*SLIMESCALE;
-        Geometry geo = new Geometry("Slime", new Box(slimeScale, slimeScale, slimeScale));
-        //TODO: Cache materials per color to save draw calls
-        Material mat = new Material(slimeMat.getMaterialDef());
-        ColorRGBA col;
-        switch(color){
-            case Slime.GREEN: col = ColorRGBA.Green;
-            break;
-            case Slime.BLUE: col = ColorRGBA.Blue;
-            break;
-            case Slime.RED: col = ColorRGBA.Red;
-            break;
-            default: col = ColorRGBA.White;
-            break;
-        }
-        mat.setColor("Color", col);
-        geo.setMaterial(mat);
-        return geo;
     }
     
     public EntityId spawnSlime(float posX, float posY, String color, int size){
@@ -122,8 +76,6 @@ public class SlimeState extends BaseAppState{
 
     @Override
     protected void cleanup(Application app) {
-        slimeNode.removeFromParent();
-        spatMap.clear();
         slimes.release();
         getState(PhysState.class).getWorld().removeListener(slimeListener);
     }
