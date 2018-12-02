@@ -13,7 +13,6 @@ import com.mru.ld43.GameState;
 import com.mru.ld43.SlimeApp;
 import com.simsilica.lemur.Axis;
 import com.simsilica.lemur.Button;
-import com.simsilica.lemur.Command;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.FillMode;
 import com.simsilica.lemur.Label;
@@ -38,7 +37,6 @@ public class MenuState extends BaseAppState{
         //start game
         Button start = new Button("Start");
         start.addClickCommands((Command) -> {
-            System.out.println("Starting game");
             getStateManager().detach(this);
             getStateManager().attach(new GameState());
         });

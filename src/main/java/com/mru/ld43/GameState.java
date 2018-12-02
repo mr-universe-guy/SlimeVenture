@@ -62,6 +62,7 @@ public class GameState extends BaseAppState{
     public void finishLevel(String nextLevel){
         popup.setNextLevel(nextLevel);
         popup.setVisible(true);
+        getState(PlayerControlState.class).setEnabled(false);
     }
     
     @Override

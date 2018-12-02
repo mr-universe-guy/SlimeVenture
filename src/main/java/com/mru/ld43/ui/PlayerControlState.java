@@ -110,7 +110,7 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
 
     @Override
     protected void onDisable() {
-        
+        player.set(new Driver(0,0));
     }
     
     public EntityId getPlayerId(){
