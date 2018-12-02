@@ -26,6 +26,7 @@ import com.simsilica.lemur.Container;
 import com.simsilica.lemur.FillMode;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.component.BoxLayout;
+import java.io.File;
 
 /**
  *
@@ -34,9 +35,9 @@ import com.simsilica.lemur.component.BoxLayout;
 public class GameState extends BaseAppState{
     private boolean gameStarted = false;
     private NextLevelPopup popup;
-    private String startingLevel;
+    private Object startingLevel;
 
-    public GameState(String startingLevel) {
+    public GameState(Object startingLevel) {
         this.startingLevel = startingLevel;
     }
     
@@ -77,7 +78,11 @@ public class GameState extends BaseAppState{
             SceneState scene = getState(SceneState.class);
             if(scene != null && scene.isInitialized()){
                 gameStarted = true;
-                scene.loadLevel(startingLevel);
+                if(startingLevel instanceof String){
+                    scene.loadLevel((String)startingLevel);
+                } else if(startingLevel instanceof File){
+                    scene.loadLevelFromFile((File)startingLevel);
+                }
             }
         }
     }

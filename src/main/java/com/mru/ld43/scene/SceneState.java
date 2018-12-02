@@ -13,7 +13,7 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-import groovy.lang.Script;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -31,7 +31,8 @@ public class SceneState extends BaseAppState{
     private final List<EntityId> sceneObjects = new ArrayList<>();
     protected final Binding binding = new Binding();
     protected final GroovyShell shell = new GroovyShell(binding);
-    protected Script currentLevel;
+//    protected Script currentLevel;
+    protected Object currentLevel;
     private final EntityData data;
 
     public SceneState(EntityData data) {
@@ -70,20 +71,31 @@ public class SceneState extends BaseAppState{
     }
     
     public void restartLevel(){
-        clearLevel();
-        getApplication().enqueue(() -> {
-            currentLevel.run();
-        });
+        if(currentLevel instanceof String){
+            loadLevel((String)currentLevel);
+        } else if(currentLevel instanceof File){
+            loadLevelFromFile((File)currentLevel);
+        }
+        
     }
     
     public void loadLevel(String resource){
         clearLevel();
         //we are not caching scripts atm
         try {
-            binding.setProperty("scene", this);
-            currentLevel = shell.parse(SceneState.class.getClassLoader().getResource(resource).toURI());
-            currentLevel.run();
+            currentLevel = resource;
+            shell.evaluate(SceneState.class.getClassLoader().getResource(resource).toURI());
         } catch (URISyntaxException | CompilationFailedException | IOException ex) {
+            Logger.getLogger(SceneState.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void loadLevelFromFile(File file){
+        clearLevel();
+        try{
+            currentLevel = file;
+            shell.evaluate(file);
+        } catch (CompilationFailedException | IOException ex) {
             Logger.getLogger(SceneState.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

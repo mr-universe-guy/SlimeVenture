@@ -22,9 +22,7 @@ public class LD43 {
             Logger logger = Logger.getLogger(LD43.class.getName()).getParent();
             logger.addHandler(fh);
             fh.setFormatter(new SimpleFormatter());
-        } catch (IOException ex) {
-            Logger.getLogger(LD43.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             Logger.getLogger(LD43.class.getName()).log(Level.SEVERE, null, ex);
         }
         SlimeApp app = new SlimeApp();

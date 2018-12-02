@@ -20,6 +20,7 @@ import com.simsilica.lemur.FillMode;
 import com.simsilica.lemur.component.BorderLayout;
 import com.simsilica.lemur.component.BoxLayout;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  * Lets you go straight to a level, mostly for testing
@@ -37,6 +39,7 @@ public class LevelSelectState extends BaseAppState{
     private final Node uiNode = new Node("UI");
     private final Container menuCont = new Container(new BorderLayout());
     private final Container levelCont = new Container(new BoxLayout(Axis.Y, FillMode.Even));
+    private JFileChooser chooser = new JFileChooser();
     private Camera cam;
     
     public LevelSelectState(){
@@ -63,6 +66,7 @@ public class LevelSelectState extends BaseAppState{
 
     @Override
     protected void initialize(Application app) {
+        chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         cam = app.getCamera();
         Container buttonCont = new Container(new BorderLayout());
         Button prev = new Button("<");
@@ -70,8 +74,20 @@ public class LevelSelectState extends BaseAppState{
         Button next = new Button(">");
         buttonCont.addChild(next, BorderLayout.Position.East);
         menuCont.addChild(buttonCont, BorderLayout.Position.North);
+        //levels
         fillLevels(0);
         menuCont.addChild(levelCont, BorderLayout.Position.Center);
+        //from file
+        Button fromFile = new Button("File");
+        fromFile.addClickCommands(new Command(){
+            @Override
+            public void execute(Object s) {
+                if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+                    loadLevel(chooser.getSelectedFile());
+                }
+            }
+        });
+        menuCont.addChild(fromFile, BorderLayout.Position.South);
         uiNode.attachChild(menuCont);
         ((SlimeApp)app).getGuiNode().attachChild(uiNode);
     }
@@ -100,10 +116,14 @@ public class LevelSelectState extends BaseAppState{
         menuCont.setLocalTranslation((width/2)-(menuSize.x/2), (height/2)+(menuSize.y/2), 0);
     }
     
-    private void loadLevel(String level){
-        String levelPath = "Scenes/"+level+".groovy";
+    private void loadLevel(Object level){
+        if(level instanceof String){
+            String levelPath = "Scenes/"+level+".groovy";
+            getStateManager().attach(new GameState(levelPath));
+        } else if(level instanceof File){
+            getStateManager().attach(new GameState((File)level));
+        }
         getStateManager().detach(this);
-        getStateManager().attach(new GameState(levelPath));
     }
 
     @Override
