@@ -104,6 +104,12 @@ public class SlimeState extends BaseAppState{
         
     }
     
+    public void clearSlimes(){
+        for(Entity e : slimes){
+            data.removeEntity(e.getId());
+        }
+    }
+    
     /**
      * Slime Listener looks for collisions between slimes and determines if they
      * should grow or shrink/die

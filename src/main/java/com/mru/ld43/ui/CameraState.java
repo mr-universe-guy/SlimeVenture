@@ -45,8 +45,10 @@ public class CameraState extends BaseAppState{
     public void update(float tpf) {
         if(target != null && target.applyChanges()){
             Position pos = target.get(Position.class);
-            Vector3f camPos = new Vector3f(pos.getX(),pos.getY(),camDistance);
-            cam.setLocation(camPos);
+            if(pos != null){
+                Vector3f camPos = new Vector3f(pos.getX(),pos.getY(),camDistance);
+                cam.setLocation(camPos);
+            }
         }
     }
 

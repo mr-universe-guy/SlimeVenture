@@ -7,8 +7,6 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.mru.ld43.mob.Driver;
-import com.mru.ld43.mob.Mob;
 import com.mru.ld43.ui.PlayerControlState;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -32,6 +30,7 @@ public class SceneState extends BaseAppState{
     private final List<EntityId> sceneObjects = new ArrayList<>();
     protected final Binding binding = new Binding();
     protected final GroovyShell shell = new GroovyShell(binding);
+    protected Script currentLevel;
     private final EntityData data;
 
     public SceneState(EntityData data) {
@@ -59,19 +58,30 @@ public class SceneState extends BaseAppState{
         }
     }
     
-    public void loadLevel(String resource){
-        //clear previous level
+    protected void clearLevel(){
         Iterator<EntityId> it = sceneObjects.iterator();
         while(it.hasNext()){
             EntityId id = it.next();
             data.removeEntity(id);
             it.remove();
         }
+        getState(SlimeState.class).clearSlimes();
+    }
+    
+    public void restartLevel(){
+        clearLevel();
+        getApplication().enqueue(() -> {
+            currentLevel.run();
+        });
+    }
+    
+    public void loadLevel(String resource){
+        clearLevel();
         //we are not caching scripts atm
         try {
             binding.setProperty("scene", this);
-            Script s = shell.parse(SceneState.class.getClassLoader().getResource(resource).toURI());
-            s.run();
+            currentLevel = shell.parse(SceneState.class.getClassLoader().getResource(resource).toURI());
+            currentLevel.run();
         } catch (URISyntaxException | CompilationFailedException | IOException ex) {
             Logger.getLogger(SceneState.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -99,12 +109,6 @@ public class SceneState extends BaseAppState{
     }
     
     public void spawnPlayer(float xPos, float yPos){
-        EntityId playerId = getState(PlayerControlState.class).getPlayerId();
-        data.setComponents(playerId, 
-                new Position(xPos, yPos),
-                new Slime(Slime.GREEN, 5),
-                new Driver(0,0),
-                new Mob(3)
-        );
+        getState(PlayerControlState.class).spawnPlayer(xPos, yPos);
     }
 }
