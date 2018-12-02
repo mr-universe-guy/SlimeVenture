@@ -89,6 +89,7 @@ public class LevelSelectState extends BaseAppState{
         });
         menuCont.addChild(fromFile, BorderLayout.Position.South);
         uiNode.attachChild(menuCont);
+        centerMenu();
         ((SlimeApp)app).getGuiNode().attachChild(uiNode);
     }
     
@@ -105,13 +106,11 @@ public class LevelSelectState extends BaseAppState{
             });
             levelCont.addChild(selectLevel);
         }
-        centerMenu();
     }
     
     private void centerMenu(){
         int width = cam.getWidth();
         int height = cam.getHeight();
-        
         Vector3f menuSize = menuCont.getPreferredSize();
         menuCont.setLocalTranslation((width/2)-(menuSize.x/2), (height/2)+(menuSize.y/2), 0);
     }

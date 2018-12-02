@@ -69,7 +69,7 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
         }
     }
     
-    public void spawnPlayer(float xPos, float yPos){
+    public void spawnPlayer(float xPos, float yPos, int size){
         if(player != null){
             data.removeEntity(player.getId());
             player.release();
@@ -77,7 +77,7 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
         EntityId playerId = data.createEntity();
         data.setComponents(playerId, 
                 new Position(xPos, yPos),
-                new Slime(Slime.GREEN, 5),
+                new Slime(Slime.GREEN, size),
                 new Driver(0,0),
                 new Mob(3)
         );

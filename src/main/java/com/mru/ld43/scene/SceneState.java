@@ -122,7 +122,11 @@ public class SceneState extends BaseAppState{
     }
     
     public void spawnPlayer(float xPos, float yPos){
-        getState(PlayerControlState.class).spawnPlayer(xPos, yPos);
+        spawnPlayer(xPos, yPos, 5);
+    }
+    
+    public void spawnPlayer(float xPos, float yPos, int size){
+        getState(PlayerControlState.class).spawnPlayer(xPos, yPos, size);
         getState(PlayerControlState.class).setEnabled(true);
     }
 }

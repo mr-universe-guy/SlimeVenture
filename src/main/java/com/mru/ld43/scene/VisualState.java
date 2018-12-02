@@ -13,6 +13,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.AbstractBox;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import com.mru.ld43.SlimeApp;
@@ -93,7 +94,7 @@ public class VisualState extends BaseAppState{
         } else if(model.getModel().equals(Model.WALL)){
             float width = (float)model.getArgs()[0]/2;
             float height = (float)model.getArgs()[1]/2;
-            Box box = new Box(width, height, 1f);
+            AbstractBox box = new TilingBox(width, height, 1f);
             Geometry wallGeo = new Geometry("Wall", box);
             wallGeo.setMaterial(wallMat);
             spat = wallGeo;
