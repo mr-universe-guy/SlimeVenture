@@ -7,6 +7,7 @@ package com.mru.ld43;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.mru.ld43.mob.AIState;
 import com.mru.ld43.mob.MobState;
 import com.mru.ld43.scene.PhysState;
 import com.mru.ld43.scene.SceneState;
@@ -32,7 +33,8 @@ public class GameTestState extends BaseAppState{
                 new MobState(data),
                 new SlimeState(data),
                 new PlayerControlState(data),
-                new SceneState(data)
+                new SceneState(data),
+                new AIState(data)
         );
     }
 

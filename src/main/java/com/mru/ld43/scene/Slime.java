@@ -5,7 +5,6 @@
  */
 package com.mru.ld43.scene;
 
-import com.jme3.math.ColorRGBA;
 import com.simsilica.es.EntityComponent;
 
 /**

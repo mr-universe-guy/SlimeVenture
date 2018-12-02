@@ -7,6 +7,7 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.mru.ld43.mob.AI;
 import com.mru.ld43.mob.Mob;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
@@ -50,11 +51,6 @@ public class SlimeState extends BaseAppState{
             }
             for(Entity e : slimes.getChangedEntities()){
                 Slime slime = e.get(Slime.class);
-                //todo: change color and size
-                if(slime.getSize() <= 0){
-                    //kill slime
-                    data.removeEntity(e.getId());
-                }
                 setSlimeStats(e.getId(), slime.getColor(), slime.getSize());
             }
         }
@@ -67,9 +63,11 @@ public class SlimeState extends BaseAppState{
      * @param size 
      */
     protected void setSlimeStats(EntityId id, String color, int size){
+        if(size > 6) size = 6;
+        if(size <= 0) data.removeEntity(id);
         Slime slime = new Slime(color, size);
         //size 5 slime should have a power of 3, adjust exponentially
-        float power = 0.5f+(size*(3f/5f));
+        float power = (0.15f*(size*size))+0.1f;
         Mob mob = new Mob(power);
         float colSize = slime.getSize()*(SLIMESCALE*2);
         Collider col = new Collider(false, colSize, colSize);
@@ -81,7 +79,8 @@ public class SlimeState extends BaseAppState{
         EntityId id = data.createEntity();
         Position pos = new Position(posX, posY);
         data.setComponents(id,
-                pos
+                pos,
+                new AI(AI.Behaviour.IDLE)
         );
         setSlimeStats(id, color, size);
         
