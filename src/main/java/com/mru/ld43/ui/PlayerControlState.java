@@ -102,6 +102,10 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
     protected void onDisable() {
         
     }
+    
+    public EntityId getPlayerId(){
+        return player.getId();
+    }
 
     @Override
     public void valueActive(FunctionId fi, double d, double d1) {

@@ -42,6 +42,8 @@ public class SceneState extends BaseAppState{
         //groovy
         binding.setProperty("scene", this);
         binding.setProperty("slime", getState(SlimeState.class));
+        binding.setProperty("sensor", getState(SensorState.class));
+        binding.setProperty("player", getState(PlayerControlState.class));
         app.enqueue(()->{
             loadLevel("Scenes/Test.groovy");
         });

@@ -11,6 +11,7 @@ import com.mru.ld43.mob.AIState;
 import com.mru.ld43.mob.MobState;
 import com.mru.ld43.scene.PhysState;
 import com.mru.ld43.scene.SceneState;
+import com.mru.ld43.scene.SensorState;
 import com.mru.ld43.scene.SlimeState;
 import com.mru.ld43.scene.VisualState;
 import com.mru.ld43.ui.PlayerControlState;
@@ -31,6 +32,7 @@ public class GameTestState extends BaseAppState{
                 dataState,
                 new VisualState(data),
                 new PhysState(data),
+                new SensorState(data),
                 new MobState(data),
                 new SlimeState(data),
                 new PlayerControlState(data),
