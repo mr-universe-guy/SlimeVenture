@@ -19,19 +19,47 @@ import com.simsilica.lemur.Container;
 import com.simsilica.lemur.FillMode;
 import com.simsilica.lemur.component.BorderLayout;
 import com.simsilica.lemur.component.BoxLayout;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Lets you go straight to a level, mostly for testing
  * @author matt
  */
 public class LevelSelectState extends BaseAppState{
-    private final String[] levels = new String[]{
-        "Level1"
-    };
+    private final String[] levels;
     private final Node uiNode = new Node("UI");
     private final Container menuCont = new Container(new BorderLayout());
     private final Container levelCont = new Container(new BoxLayout(Axis.Y, FillMode.Even));
     private Camera cam;
+    
+    public LevelSelectState(){
+        //read level list file and populate the levels array;
+        InputStream stream = LevelSelectState.class.getClassLoader().getResourceAsStream("Scenes/Scenes");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        List<String> levelList = new ArrayList<>();
+        try {
+            String line;
+            while((line = reader.readLine()) != null){
+                levelList.add(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(LevelSelectState.class.getName()).log(Level.SEVERE, null, ex);
+        } finally{
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(LevelSelectState.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        levels = levelList.toArray(new String[levelList.size()]);
+    }
 
     @Override
     protected void initialize(Application app) {
