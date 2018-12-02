@@ -7,12 +7,14 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.jme3.texture.Texture;
 import com.mru.ld43.SlimeApp;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
@@ -39,11 +41,13 @@ public class VisualState extends BaseAppState{
     @Override
     protected void initialize(Application app) {
         ((SlimeApp)app).getRootNode().attachChild(visualNode);
+        AssetManager am = app.getAssetManager();
         models = data.getEntities(Model.class, Position.class);
-        slimeMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        wallMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        wallMat.getAdditionalRenderState().setWireframe(true);
-        wallMat.setColor("Color", ColorRGBA.Magenta);
+        slimeMat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
+        wallMat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
+        Texture stone = am.loadTexture("Textures/Stone.png");
+        stone.setWrap(Texture.WrapMode.Repeat);
+        wallMat.setTexture("ColorMap", stone);
     }
 
     @Override
