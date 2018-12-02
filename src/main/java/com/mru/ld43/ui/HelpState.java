@@ -14,6 +14,7 @@ import com.jme3.texture.Texture;
 import com.mru.ld43.SlimeApp;
 import com.simsilica.lemur.Panel;
 import com.simsilica.lemur.component.QuadBackgroundComponent;
+import com.simsilica.lemur.input.Button;
 import com.simsilica.lemur.input.FunctionId;
 import com.simsilica.lemur.input.InputMapper;
 import com.simsilica.lemur.input.InputState;
@@ -37,6 +38,7 @@ public class HelpState extends BaseAppState implements StateFunctionListener{
         mapper.map(RETURN, KeyInput.KEY_LEFT);
         mapper.map(RETURN, KeyInput.KEY_RIGHT);
         mapper.map(RETURN, KeyInput.KEY_UP);
+        mapper.map(RETURN, Button.MOUSE_BUTTON1);
         
         mapper.addStateListener(this, RETURN);
         //ui
@@ -61,6 +63,7 @@ public class HelpState extends BaseAppState implements StateFunctionListener{
         mapper.removeMapping(RETURN, KeyInput.KEY_LEFT);
         mapper.removeMapping(RETURN, KeyInput.KEY_RIGHT);
         mapper.removeMapping(RETURN, KeyInput.KEY_UP);
+        mapper.removeMapping(RETURN, Button.MOUSE_BUTTON1);
         
         mapper.removeStateListener(this, RETURN);
     }
