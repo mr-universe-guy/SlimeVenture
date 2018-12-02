@@ -67,7 +67,21 @@ public class SlimeState extends BaseAppState{
         if(size <= 0) data.removeEntity(id);
         Slime slime = new Slime(color, size);
         //size 5 slime should have a power of 3, adjust exponentially
-        float power = (0.15f*(size*size))+0.1f;
+        float power;
+        switch(size){
+            case 6: power = 8f;
+            break;
+            case 5: power = 4f;
+            break;
+            case 4: power = 3.2f;
+            break;
+            case 3: power = 2.2f;
+            break;
+            case 2: power = 0.75f;
+            break;
+            default: power = 0.25f;
+            break;
+        }
         Mob mob = new Mob(power);
         float colSize = slime.getSize()*(SLIMESCALE*2);
         Collider col = new Collider(false, colSize, colSize);
@@ -90,7 +104,11 @@ public class SlimeState extends BaseAppState{
     @Override
     protected void cleanup(Application app) {
         slimes.release();
-        getState(PhysState.class).getWorld().removeListener(slimeListener);
+        collidedSlimes.release();
+        PhysState phys = getState(PhysState.class);
+        if(phys != null){
+            phys.getWorld().removeListener(slimeListener);
+        }
     }
 
     @Override

@@ -56,6 +56,12 @@ public class SensorState extends BaseAppState implements StepListener{
     public void addSensor(Sensor sensor){
         sensors.add(sensor);
     }
+    
+    public void removeSensor(Sensor sensor){
+        getApplication().enqueue(() -> {
+            sensors.remove(sensor);
+        });
+    }
 
     @Override
     public void begin(Step step, World world) {

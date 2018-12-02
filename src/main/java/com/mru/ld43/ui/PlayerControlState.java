@@ -90,7 +90,8 @@ public class PlayerControlState extends BaseAppState implements AnalogFunctionLi
 
     @Override
     protected void cleanup(Application app) {
-        
+        if(player != null) player.release();
+        getStateManager().detach(getState(CameraState.class));
     }
 
     @Override

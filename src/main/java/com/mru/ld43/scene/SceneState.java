@@ -7,6 +7,7 @@ package com.mru.ld43.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.mru.ld43.GameState;
 import com.mru.ld43.ui.PlayerControlState;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -44,9 +45,7 @@ public class SceneState extends BaseAppState{
         binding.setProperty("slime", getState(SlimeState.class));
         binding.setProperty("sensor", getState(SensorState.class));
         binding.setProperty("player", getState(PlayerControlState.class));
-        app.enqueue(()->{
-            loadLevel("Scenes/Test.groovy");
-        });
+        binding.setProperty("game", getState(GameState.class));
     }
 
     @Override

@@ -126,6 +126,11 @@ public class VisualState extends BaseAppState{
     @Override
     protected void cleanup(Application app) {
         models.release();
+        for(Actor actor : spatMap.values()){
+            actor.spat.removeFromParent();
+        }
+        spatMap.clear();
+        visualNode.removeFromParent();
     }
 
     @Override
