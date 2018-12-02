@@ -1,0 +1,56 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'com.mru.ld43.LD43'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+ext.jmeVersion = "[3.2,)"
+
+project(":assets"){
+    apply plugin: "java"
+    buildDir = rootProject.file("build/assets")
+    sourceSets {
+        main {
+            resources {
+                srcDir '.'
+            }
+        }
+    }
+}
+
+dependencies {
+    compile "org.jmonkeyengine:jme3-core:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-desktop:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-lwjgl:$jmeVersion"
+    compile "org.jmonkeyengine:jme3-plugins:$jmeVersion"
+    compile "com.simsilica:lemur:[1.+,)"
+    compile "com.simsilica:zay-es:[1.+,)"
+    compile "org.dyn4j:dyn4j:[3.3.0,)"
+    compile 'org.codehaus.groovy:groovy-all:2.4.15'
+    
+    runtime project(':assets')
+    //testCompile group: 'junit', name: 'junit', version: '4.10'
+}
+
+idea {
+    module{
+        downloadJavadoc=true
+        downloadSources=true
+    }
+}
+
+jar {
+    manifest{
+        attributes 'Main-Class':'com.mru.spooky.Spooky'
+    }
+}
