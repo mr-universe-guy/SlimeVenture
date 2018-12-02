@@ -38,11 +38,15 @@ public class MenuState extends BaseAppState{
         Button start = new Button("Start");
         start.addClickCommands((Command) -> {
             getStateManager().detach(this);
-            getStateManager().attach(new GameState());
+            getStateManager().attach(new GameState("Levels/Level1.groovy"));
         });
         buttonContainer.addChild(start);
         //level selector
         Button select = new Button("Select Level");
+        select.addClickCommands((Command) -> {
+            getStateManager().detach(this);
+            getStateManager().attach(new LevelSelectState());
+        });
         buttonContainer.addChild(select);
         //help menu
         Button help = new Button("Help");

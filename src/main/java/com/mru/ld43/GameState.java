@@ -34,6 +34,11 @@ import com.simsilica.lemur.component.BoxLayout;
 public class GameState extends BaseAppState{
     private boolean gameStarted = false;
     private NextLevelPopup popup;
+    private String startingLevel;
+
+    public GameState(String startingLevel) {
+        this.startingLevel = startingLevel;
+    }
     
     @Override
     protected void initialize(Application app) {
@@ -72,7 +77,7 @@ public class GameState extends BaseAppState{
             SceneState scene = getState(SceneState.class);
             if(scene != null && scene.isInitialized()){
                 gameStarted = true;
-                scene.loadLevel("Scenes/Level1.groovy");
+                scene.loadLevel(startingLevel);
             }
         }
     }
