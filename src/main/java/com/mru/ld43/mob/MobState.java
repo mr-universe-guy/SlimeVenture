@@ -9,6 +9,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
 import com.mru.ld43.scene.Collider;
 import com.mru.ld43.scene.PhysState;
+import com.mru.ld43.ui.SoundState;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
@@ -80,6 +81,7 @@ public class MobState extends BaseAppState implements StepListener{
                             if(!r.getBody().equals(b)){
                                 //grounded
                                 b.applyImpulse(new Vector2(0,mob.speed));
+                                getState(SoundState.class).playClip(SoundState.getRandomSlap());
                             }
                         }
                     }

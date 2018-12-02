@@ -14,6 +14,7 @@ import com.mru.ld43.scene.SceneState;
 import com.mru.ld43.scene.SlimeState;
 import com.mru.ld43.scene.VisualState;
 import com.mru.ld43.ui.PlayerControlState;
+import com.mru.ld43.ui.SoundState;
 import com.simsilica.es.EntityData;
 
 /**
@@ -34,7 +35,8 @@ public class GameTestState extends BaseAppState{
                 new SlimeState(data),
                 new PlayerControlState(data),
                 new SceneState(data),
-                new AIState(data)
+                new AIState(data),
+                new SoundState()
         );
     }
 
